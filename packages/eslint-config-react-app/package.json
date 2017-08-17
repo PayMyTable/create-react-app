@@ -1,12 +1,9 @@
 {
-  "name": "eslint-config-react-app",
-  "version": "2.0.0",
+  "name": "@paymytable/pmt-eslint-config-react-app",
+  "version": "2.0.1",
   "description": "ESLint configuration used by Create React App",
-  "repository": "facebookincubator/create-react-app",
+  "repository": "paymytable/pmt-create-react-app",
   "license": "BSD-3-Clause",
-  "bugs": {
-    "url": "https://github.com/facebookincubator/create-react-app/issues"
-  },
   "files": [
     "index.js"
   ],

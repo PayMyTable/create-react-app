@@ -1,14 +1,11 @@
 {
-  "name": "react-scripts",
-  "version": "1.0.11",
+  "name": "@paymytable/pmt-react-scripts",
+  "version": "1.0.12",
   "description": "Configuration and scripts for Create React App.",
-  "repository": "facebookincubator/create-react-app",
+  "repository": "paymytable/pmt-create-react-app",
   "license": "BSD-3-Clause",
   "engines": {
     "node": ">=6"
-  },
-  "bugs": {
-    "url": "https://github.com/facebookincubator/create-react-app/issues"
   },
   "files": [
     "bin",

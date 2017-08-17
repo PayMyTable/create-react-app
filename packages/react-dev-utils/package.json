@@ -1,12 +1,9 @@
 {
-  "name": "react-dev-utils",
-  "version": "3.1.0",
+  "name": "@paymytable/pmt-react-dev-utils",
+  "version": "3.1.1",
   "description": "Webpack utilities used by Create React App",
-  "repository": "facebookincubator/create-react-app",
+  "repository": "paymytable/pmt-create-react-app",
   "license": "BSD-3-Clause",
-  "bugs": {
-    "url": "https://github.com/facebookincubator/create-react-app/issues"
-  },
   "engines": {
     "node": ">=6"
   },
