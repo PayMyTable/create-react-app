@@ -16,12 +16,14 @@ const webpack = require('webpack');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const ExtractTextPlugin = require('extract-text-webpack-plugin');
 const ManifestPlugin = require('webpack-manifest-plugin');
-const InterpolateHtmlPlugin = require('react-dev-utils/InterpolateHtmlPlugin');
+const InterpolateHtmlPlugin = require('@paymytable/pmt-react-dev-utils/InterpolateHtmlPlugin');
 const SWPrecacheWebpackPlugin = require('sw-precache-webpack-plugin');
-const eslintFormatter = require('react-dev-utils/eslintFormatter');
-const ModuleScopePlugin = require('react-dev-utils/ModuleScopePlugin');
+const eslintFormatter = require('@paymytable/pmt-react-dev-utils/eslintFormatter');
+const ModuleScopePlugin = require('@paymytable/pmt-react-dev-utils/ModuleScopePlugin');
 const paths = require('./paths');
 const getClientEnvironment = require('./env');
+
+const LodashModuleReplacementPlugin = require('lodash-webpack-plugin');
 
 // Webpack uses `publicPath` to determine where the app is being served from.
 // It requires a trailing slash, or the file assets will get an incorrect path.
@@ -112,6 +114,10 @@ module.exports = {
       // Support React Native Web
       // https://www.smashingmagazine.com/2016/08/a-glimpse-into-the-future-with-react-native-for-web/
       'react-native': 'react-native-web',
+
+      'pmt-utils': '@paymytable/pmt-utils/src',
+      'pmt-modules': '@paymytable/pmt-modules/src',
+      'pmt-ui': '@paymytable/pmt-ui/src',
     },
     plugins: [
       // Prevents users from importing files from outside of src/ (or node_modules/).
@@ -143,7 +149,7 @@ module.exports = {
               // TODO: consider separate config for production,
               // e.g. to enable no-console and no-debugger only in production.
               baseConfig: {
-                extends: [require.resolve('eslint-config-react-app')],
+                extends: [require.resolve('@paymytable/pmt-eslint-config-react-app')],
               },
               ignore: false,
               useEslintrc: false,
@@ -177,7 +183,7 @@ module.exports = {
             options: {
               // @remove-on-eject-begin
               babelrc: false,
-              presets: [require.resolve('babel-preset-react-app')],
+              presets: [require.resolve('@paymytable/pmt-babel-preset-react-app')],
               // @remove-on-eject-end
               compact: true,
             },
@@ -350,6 +356,14 @@ module.exports = {
     // https://github.com/jmblog/how-to-optimize-momentjs-with-webpack
     // You can remove this if you don't use Moment.js:
     new webpack.IgnorePlugin(/^\.\/locale$/, /moment$/),
+
+    // see lodash-webpack-plugin
+    new LodashModuleReplacementPlugin({
+      // TODO: to be tested
+      caching: true,
+      paths: true,
+      chaining: true,
+    }),
   ],
   // Some libraries import Node modules but don't use them in the browser.
   // Tell Webpack to provide empty mocks for them so importing them works.

@@ -15,12 +15,19 @@ const path = require('path');
 const webpack = require('webpack');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const CaseSensitivePathsPlugin = require('case-sensitive-paths-webpack-plugin');
-const InterpolateHtmlPlugin = require('react-dev-utils/InterpolateHtmlPlugin');
-const WatchMissingNodeModulesPlugin = require('react-dev-utils/WatchMissingNodeModulesPlugin');
-const eslintFormatter = require('react-dev-utils/eslintFormatter');
-const ModuleScopePlugin = require('react-dev-utils/ModuleScopePlugin');
+const InterpolateHtmlPlugin = require('@paymytable/pmt-react-dev-utils/InterpolateHtmlPlugin');
+const WatchMissingNodeModulesPlugin = require('@paymytable/pmt-react-dev-utils/WatchMissingNodeModulesPlugin');
+const eslintFormatter = require('@paymytable/pmt-react-dev-utils/eslintFormatter');
+const ModuleScopePlugin = require('@paymytable/pmt-react-dev-utils/ModuleScopePlugin');
 const getClientEnvironment = require('./env');
 const paths = require('./paths');
+
+const babelPreset = require.resolve('@paymytable/pmt-babel-preset-react-app')
+
+const FlowTypecheckPlugin = require('@paymytable/pmt-react-dev-utils/FlowTypecheckPlugin');
+
+// TODO
+// const LodashModuleReplacementPlugin = require('lodash-webpack-plugin');
 
 // Webpack uses `publicPath` to determine where the app is being served from.
 // In development, we always serve from the root. This makes config easier.
@@ -53,11 +60,16 @@ module.exports = {
     // the line below with these two lines if you prefer the stock client:
     // require.resolve('webpack-dev-server/client') + '?/',
     // require.resolve('webpack/hot/dev-server'),
-    require.resolve('react-dev-utils/webpackHotDevClient'),
+    require.resolve('@paymytable/pmt-react-dev-utils/webpackHotDevClient'),
     // We ship a few polyfills by default:
     require.resolve('./polyfills'),
     // Errors should be considered fatal in development
-    require.resolve('react-error-overlay'),
+    // If an error occured here:
+    // - do you have correctly install / link ?
+    // - in case of link, on pmt-react-error-overlay:
+    //  - npm install
+    //  - npm build
+    require.resolve('@paymytable/pmt-react-error-overlay'),
     // Finally, this is your app's code:
     paths.appIndexJs,
     // We include the app code last so that if there is a runtime error during
@@ -86,7 +98,12 @@ module.exports = {
     // We placed these paths second because we want `node_modules` to "win"
     // if there are any conflicts. This matches Node resolution mechanism.
     // https://github.com/facebookincubator/create-react-app/issues/253
-    modules: ['node_modules', paths.appNodeModules].concat(
+    modules: [
+      paths.appSrc,
+      paths.appNodeModules,
+      'node_modules',
+    ]
+    .concat(
       // It is guaranteed to exist because we tweak it in `env.js`
       process.env.NODE_PATH.split(path.delimiter).filter(Boolean)
     ),
@@ -110,6 +127,10 @@ module.exports = {
       // Support React Native Web
       // https://www.smashingmagazine.com/2016/08/a-glimpse-into-the-future-with-react-native-for-web/
       'react-native': 'react-native-web',
+
+      'pmt-ui': paths.pmtUi,
+      'pmt-utils': paths.pmtUtils,
+      'pmt-modules': paths.pmtModules,
     },
     plugins: [
       // Prevents users from importing files from outside of src/ (or node_modules/).
@@ -139,7 +160,7 @@ module.exports = {
               eslintPath: require.resolve('eslint'),
               // @remove-on-eject-begin
               baseConfig: {
-                extends: [require.resolve('eslint-config-react-app')],
+                extends: [require.resolve('@paymytable/pmt-eslint-config-react-app')],
               },
               ignore: false,
               useEslintrc: false,
@@ -148,7 +169,9 @@ module.exports = {
             loader: require.resolve('eslint-loader'),
           },
         ],
-        include: paths.appSrc,
+        include: [
+          paths.appSrc
+        ].concat(paths.sdkIncludePaths), // concat the PayMyTable sdk to build it.,
       },
       {
         // "oneOf" will traverse all following loaders until one will
@@ -169,18 +192,27 @@ module.exports = {
           // Process JS with Babel.
           {
             test: /\.(js|jsx)$/,
-            include: paths.appSrc,
+            include: [
+              paths.appSrc
+            ].concat(paths.sdkIncludePaths), // concat the PayMyTable sdk to build it.
             loader: require.resolve('babel-loader'),
             options: {
               // @remove-on-eject-begin
               babelrc: false,
-              presets: [require.resolve('babel-preset-react-app')],
+              presets: [babelPreset],
               // @remove-on-eject-end
               // This is a feature of `babel-loader` for webpack (not Babel itself).
               // It enables caching results in ./node_modules/.cache/babel-loader/
               // directory for faster rebuilds.
               cacheDirectory: true,
             },
+          },
+          {
+            test: /\.scss$/,
+            include: [
+              paths.appSrc
+            ].concat(paths.sdkIncludePaths), // concat the PayMyTable sdk to build it.,
+            loaders: ["style", "css", "sass"]
           },
           // "postcss" loader applies autoprefixer to our CSS.
           // "css" loader resolves paths in CSS and adds assets as dependencies.
@@ -274,6 +306,18 @@ module.exports = {
     // https://github.com/jmblog/how-to-optimize-momentjs-with-webpack
     // You can remove this if you don't use Moment.js:
     new webpack.IgnorePlugin(/^\.\/locale$/, /moment$/),
+
+    // Run Flow on files with the @flow header
+    new FlowTypecheckPlugin(),
+
+    // // see lodash-webpack-plugin
+    // new LodashModuleReplacementPlugin({
+    //   // TODO: to be tested
+    //   caching: true,
+    //   paths: true,
+    //   chaining: true,
+    // }),
+    // new webpack.optimize.UglifyJsPlugin(),
   ],
   // Some libraries import Node modules but don't use them in the browser.
   // Tell Webpack to provide empty mocks for them so importing them works.

@@ -85,6 +85,18 @@ module.exports = {
   // These properties only exist before ejecting:
   ownPath: resolveOwn('.'),
   ownNodeModules: resolveOwn('node_modules'), // This is empty on npm 3
+
+    // compile our sdk instead of using a compiled version.
+  pmtUi: resolveApp("src/sdk/pmt-ui/src"),
+  pmtUtils: resolveApp("src/sdk/pmt-utils/src"),
+  pmtModules: resolveApp("src/sdk/pmt-modules/src"),
+
+  // https://github.com/webpack/webpack/issues/1643
+  sdkIncludePaths: [
+    fs.realpathSync(resolveApp('.') + '/src/sdk/pmt-ui/src'),
+    fs.realpathSync(resolveApp('.') + '/src/sdk/pmt-utils/src'),
+    fs.realpathSync(resolveApp('.') + '/src/sdk/pmt-modules/src'),
+  ],
 };
 
 const ownPackageJson = require('../package.json');
@@ -94,6 +106,11 @@ const reactScriptsLinked =
   fs.lstatSync(reactScriptsPath).isSymbolicLink();
 
 // config before publish: we're in ./packages/react-scripts/config/
+if (!reactScriptsLinked) {
+  console.log('react-scripts not found !')
+  return
+}
+
 if (
   !reactScriptsLinked &&
   __dirname.indexOf(path.join('packages', 'react-scripts', 'config')) !== -1

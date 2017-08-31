@@ -10,7 +10,7 @@
 
 'use strict';
 
-const spawn = require('react-dev-utils/crossSpawn');
+const spawn = require('@paymytable/pmt-react-dev-utils/crossSpawn');
 const args = process.argv.slice(2);
 
 const scriptIndex = args.findIndex(x =>

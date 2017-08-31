@@ -8,6 +8,13 @@
  */
 'use strict';
 
+const devPlugins = [
+  // Adds hot loader
+  // TODO: fix Module build failed: TypeError: Cannot read property 'cacheable' of undefined
+  // see https://stackoverflow.com/questions/41553450/strange-exception-by-process-of-writing-some-app-in-reactjs
+  // require.resolve('react-hot-loader/patch'),
+]
+
 const plugins = [
   // class { handleClick = () => { } }
   require.resolve('babel-plugin-transform-class-properties'),
@@ -36,6 +43,23 @@ const plugins = [
       regenerator: true,
     },
   ],
+  // add decoractors
+  // Ex: @withRestaurant
+  // class ...
+  require.resolve("babel-plugin-transform-decorators-legacy"),
+  // add trailing function commas
+  // Ex: this.myFunc(
+  //  a,
+  //  b,
+  //  c, <--
+  // )
+  require.resolve("babel-plugin-syntax-trailing-function-commas"),
+  // transform the eventual for-of
+  // for of is not supported on old browsers
+  require.resolve("babel-plugin-transform-es2015-for-of"),
+
+  // https://github.com/lodash/babel-plugin-lodash
+  require.resolve("babel-plugin-lodash"),
 ];
 
 // This is similar to how `env` works in Babel:
@@ -62,12 +86,12 @@ if (env === 'development' || env === 'test') {
   // https://github.com/babel/babel/issues/4702
   // https://github.com/babel/babel/pull/3540#issuecomment-228673661
   // https://github.com/facebookincubator/create-react-app/issues/989
-  plugins.push.apply(plugins, [
+  plugins.push.apply(plugins, devPlugins.concat([
     // Adds component stack to warning messages
     require.resolve('babel-plugin-transform-react-jsx-source'),
     // Adds __self attribute to JSX which React will use for some warnings
     require.resolve('babel-plugin-transform-react-jsx-self'),
-  ]);
+  ]));
 }
 
 if (env === 'test') {
@@ -111,7 +135,11 @@ if (env === 'test') {
         },
       ],
       // JSX, Flow
+      // preset "react"
       require.resolve('babel-preset-react'),
+      // preset "flow"
+      // require.resolve("babel-preset-flow"),
+      require.resolve("babel-preset-stage-1"),
     ],
     plugins: plugins.concat([
       // function* () { yield 42; yield 43; }
