@@ -26,8 +26,7 @@ const babelPreset = require.resolve('@paymytable/pmt-babel-preset-react-app')
 
 const FlowTypecheckPlugin = require('@paymytable/pmt-react-dev-utils/FlowTypecheckPlugin');
 
-// TODO
-// const LodashModuleReplacementPlugin = require('lodash-webpack-plugin');
+const LodashModuleReplacementPlugin = require('lodash-webpack-plugin');
 
 // Webpack uses `publicPath` to determine where the app is being served from.
 // In development, we always serve from the root. This makes config easier.
@@ -310,14 +309,14 @@ module.exports = {
     // Run Flow on files with the @flow header
     new FlowTypecheckPlugin(),
 
-    // // see lodash-webpack-plugin
-    // new LodashModuleReplacementPlugin({
-    //   // TODO: to be tested
-    //   caching: true,
-    //   paths: true,
-    //   chaining: true,
-    // }),
-    // new webpack.optimize.UglifyJsPlugin(),
+    // see lodash-webpack-plugin on babel-preset-react-app
+    // https://www.npmjs.com/package/lodash-webpack-plugin
+    new LodashModuleReplacementPlugin({
+      // TODO: to be tested
+      caching: true,
+      paths: true,
+      chaining: true,
+    }),
   ],
   // Some libraries import Node modules but don't use them in the browser.
   // Tell Webpack to provide empty mocks for them so importing them works.

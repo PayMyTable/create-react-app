@@ -1,4 +1,4 @@
-// @remove-on-eject-begin
+  // @remove-on-eject-begin
 /**
  * Copyright (c) 2015-present, Facebook, Inc.
  * All rights reserved.
@@ -115,9 +115,9 @@ module.exports = {
       // https://www.smashingmagazine.com/2016/08/a-glimpse-into-the-future-with-react-native-for-web/
       'react-native': 'react-native-web',
 
-      'pmt-utils': '@paymytable/pmt-utils/src',
-      'pmt-modules': '@paymytable/pmt-modules/src',
-      'pmt-ui': '@paymytable/pmt-ui/src',
+      'pmt-ui': paths.pmtUi,
+      'pmt-utils': paths.pmtUtils,
+      'pmt-modules': paths.pmtModules,
     },
     plugins: [
       // Prevents users from importing files from outside of src/ (or node_modules/).
@@ -158,7 +158,9 @@ module.exports = {
             loader: require.resolve('eslint-loader'),
           },
         ],
-        include: paths.appSrc,
+        include: [
+          paths.appSrc,
+        ].concat(paths.sdkIncludePaths), // concat the PayMyTable sdk to build it.
       },
       {
         // "oneOf" will traverse all following loaders until one will
@@ -178,7 +180,9 @@ module.exports = {
           // Process JS with Babel.
           {
             test: /\.(js|jsx)$/,
-            include: paths.appSrc,
+            include: [
+              paths.appSrc
+            ].concat(paths.sdkIncludePaths), // concat the PayMyTable sdk to build it.
             loader: require.resolve('babel-loader'),
             options: {
               // @remove-on-eject-begin
@@ -357,7 +361,8 @@ module.exports = {
     // You can remove this if you don't use Moment.js:
     new webpack.IgnorePlugin(/^\.\/locale$/, /moment$/),
 
-    // see lodash-webpack-plugin
+    // see lodash-webpack-plugin on babel-preset-react-app
+    // https://www.npmjs.com/package/lodash-webpack-plugin
     new LodashModuleReplacementPlugin({
       // TODO: to be tested
       caching: true,
