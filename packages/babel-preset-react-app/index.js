@@ -12,7 +12,8 @@ const devPlugins = [
   // Adds hot loader
   // TODO: fix Module build failed: TypeError: Cannot read property 'cacheable' of undefined
   // see https://stackoverflow.com/questions/41553450/strange-exception-by-process-of-writing-some-app-in-reactjs
-  // require.resolve('react-hot-loader/patch'),
+  // https://github.com/gaearon/react-hot-loader/tree/master/docs#migration-to-30
+  require.resolve('react-hot-loader/babel'),
 ]
 
 const plugins = [
