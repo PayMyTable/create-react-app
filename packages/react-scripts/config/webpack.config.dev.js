@@ -214,7 +214,11 @@ module.exports = {
             include: [
               paths.appSrc
             ].concat(paths.sdkIncludePaths), // concat the PayMyTable sdk to build it.,
-            loaders: ["style", "css", "sass"]
+            loaders: [
+              require.resolve('babel-loader'),
+              require.resolve('css-loader'),
+              require.resolve('sass-loader'),
+            ]
           },
           // "postcss" loader applies autoprefixer to our CSS.
           // "css" loader resolves paths in CSS and adds assets as dependencies.
@@ -263,11 +267,25 @@ module.exports = {
             // it's runtime that would otherwise processed through "file" loader.
             // Also exclude `html` and `json` extensions so they get processed
             // by webpacks internal loaders.
-            exclude: [/\.js$/, /\.html$/, /\.json$/],
+            exclude: [
+              /\.js$/,
+              /\.html$/,
+              /\.json$/,
+              /\.svg$/,
+              /\.scss$/,
+            ],
             loader: require.resolve('file-loader'),
             options: {
               name: 'static/media/[name].[hash:8].[ext]',
             },
+          },
+          // "file" loader for svg
+          {
+            test: /\.svg$/,
+            loader: require.resolve('file-loader'),
+            query: {
+              name: 'static/media/[name].[hash:8].[ext]'
+            }
           },
         ],
       },
