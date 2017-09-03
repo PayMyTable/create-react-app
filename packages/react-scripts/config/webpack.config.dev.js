@@ -215,7 +215,7 @@ module.exports = {
               paths.appSrc
             ].concat(paths.sdkIncludePaths), // concat the PayMyTable sdk to build it.,
             loaders: [
-              require.resolve('babel-loader'),
+              require.resolve('style-loader'),
               require.resolve('css-loader'),
               require.resolve('sass-loader'),
             ]
@@ -257,6 +257,14 @@ module.exports = {
               },
             ],
           },
+          // "file" loader for svg
+          {
+            test: /\.svg$/,
+            loader: require.resolve('file-loader'),
+            query: {
+              name: 'static/media/[name].[hash:8].[ext]'
+            }
+          },
           // "file" loader makes sure those assets get served by WebpackDevServer.
           // When you `import` an asset, you get its (virtual) filename.
           // In production, they would get copied to the `build` folder.
@@ -278,14 +286,6 @@ module.exports = {
             options: {
               name: 'static/media/[name].[hash:8].[ext]',
             },
-          },
-          // "file" loader for svg
-          {
-            test: /\.svg$/,
-            loader: require.resolve('file-loader'),
-            query: {
-              name: 'static/media/[name].[hash:8].[ext]'
-            }
           },
         ],
       },
@@ -328,7 +328,8 @@ module.exports = {
     new webpack.IgnorePlugin(/^\.\/locale$/, /moment$/),
 
     // Run Flow on files with the @flow header
-    new FlowTypecheckPlugin(),
+    // TODO: test
+    // new FlowTypecheckPlugin(),
 
     // see lodash-webpack-plugin on babel-preset-react-app
     // https://www.npmjs.com/package/lodash-webpack-plugin
