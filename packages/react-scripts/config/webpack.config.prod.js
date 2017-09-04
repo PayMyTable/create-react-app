@@ -280,7 +280,7 @@ module.exports = {
               /\.html$/,
               /\.json$/,
               /\.svg$/,
-              /\.scss$/,  
+              /\.scss$/,
             ],
             options: {
               name: 'static/media/[name].[hash:8].[ext]',
@@ -394,6 +394,7 @@ module.exports = {
       paths: true,
       chaining: true,
     }),
+
   ],
   // Some libraries import Node modules but don't use them in the browser.
   // Tell Webpack to provide empty mocks for them so importing them works.
