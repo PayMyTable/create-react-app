@@ -334,12 +334,12 @@ module.exports = {
 
     // see lodash-webpack-plugin on babel-preset-react-app
     // https://www.npmjs.com/package/lodash-webpack-plugin
-    new LodashModuleReplacementPlugin({
+    //new LodashModuleReplacementPlugin({
       // TODO: to be tested
-      caching: true,
-      paths: true,
-      chaining: true,
-    }),
+      //caching: true,
+      //paths: true,
+      //chaining: true,
+    //}),
 
     new CircularDependencyPlugin({
       exclude: /node_modules/,

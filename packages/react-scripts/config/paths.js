@@ -102,12 +102,12 @@ module.exports = {
 const ownPackageJson = require('../package.json');
 const reactScriptsPath = resolveApp(`node_modules/${ownPackageJson.name}`);
 const reactScriptsLinked =
-  fs.existsSync(reactScriptsPath) &&
+  fs.existsSync(reactScriptsPath) ||
   fs.lstatSync(reactScriptsPath).isSymbolicLink();
 
 // config before publish: we're in ./packages/react-scripts/config/
 if (!reactScriptsLinked) {
-  console.log('react-scripts not found !')
+  console.log('react-scripts not found on ' + reactScriptsPath)
   return
 }
 

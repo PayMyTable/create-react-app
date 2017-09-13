@@ -23,7 +23,7 @@ const ModuleScopePlugin = require('@paymytable/pmt-react-dev-utils/ModuleScopePl
 const paths = require('./paths');
 const getClientEnvironment = require('./env');
 
-const LodashModuleReplacementPlugin = require('lodash-webpack-plugin');
+//const LodashModuleReplacementPlugin = require('lodash-webpack-plugin');
 
 // Webpack uses `publicPath` to determine where the app is being served from.
 // It requires a trailing slash, or the file assets will get an incorrect path.
@@ -388,12 +388,12 @@ module.exports = {
 
     // see lodash-webpack-plugin on babel-preset-react-app
     // https://www.npmjs.com/package/lodash-webpack-plugin
-    new LodashModuleReplacementPlugin({
+    //new LodashModuleReplacementPlugin({
       // TODO: to be tested
-      caching: true,
-      paths: true,
-      chaining: true,
-    }),
+      //caching: true,
+      //paths: true,
+      //chaining: true,
+    //}),
 
   ],
   // Some libraries import Node modules but don't use them in the browser.

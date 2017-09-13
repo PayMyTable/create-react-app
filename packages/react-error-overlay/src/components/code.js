@@ -19,7 +19,7 @@ import {
   secondaryPreStyle,
 } from '../styles';
 
-import generateAnsiHtml from 'react-dev-utils/ansiHTML';
+import generateAnsiHtml from '@paymytable/pmt-react-dev-utils/ansiHTML';
 
 import codeFrame from 'babel-code-frame';
 
