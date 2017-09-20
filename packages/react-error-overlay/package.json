@@ -1,6 +1,6 @@
 {
   "name": "@paymytable/pmt-react-error-overlay",
-  "version": "1.1.1",
+  "version": "1.1.2",
   "description": "An overlay for displaying stack frames.",
   "main": "lib/index.js",
   "scripts": {
@@ -36,7 +36,7 @@
     "source-map": "0.5.6"
   },
   "devDependencies": {
-    "@paymytable/pmt-babel-preset-react-app": "^3.1.0",
+    "@paymytable/pmt-babel-preset-react-app": "^3.1.1",
     "@paymytable/pmt-eslint-config-react-app": "^2.0.0",
     "babel-cli": "6.24.1",
     "babel-eslint": "7.2.3",
