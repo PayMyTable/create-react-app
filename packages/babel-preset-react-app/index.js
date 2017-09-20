@@ -58,7 +58,18 @@ const plugins = [
   require.resolve("babel-plugin-transform-es2015-for-of"),
 
   // https://github.com/lodash/babel-plugin-lodash
-  require.resolve("babel-plugin-lodash"),
+  [
+    require.resolve("babel-plugin-lodash"),
+    {
+      // This plugin is moving in a lib agnostic direction, to become a generic cherry-pick plugin
+      // so babel-plugin-lodash is not limited to lodash. It can be used with recompose as well.
+      // see https://github.com/acdlite/recompose
+      id: [
+        "lodash",
+        "recompose"
+      ]
+    }
+  ]
 ];
 
 // This is similar to how `env` works in Babel:
