@@ -27,7 +27,7 @@ const babelPreset = require.resolve('@paymytable/pmt-babel-preset-react-app')
 const FlowTypecheckPlugin = require('@paymytable/pmt-react-dev-utils/FlowTypecheckPlugin');
 
 const CircularDependencyPlugin = require('circular-dependency-plugin')
-const LodashModuleReplacementPlugin = require('lodash-webpack-plugin');
+//const LodashModuleReplacementPlugin = require('lodash-webpack-plugin');
 
 // Webpack uses `publicPath` to determine where the app is being served from.
 // In development, we always serve from the root. This makes config easier.
