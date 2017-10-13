@@ -13,6 +13,7 @@
 const fs = require('fs');
 const path = require('path');
 const paths = require('./paths');
+const appPackageJson = require(paths.appPackageJson)
 
 // Make sure that including paths.js after env.js will read .env variables.
 delete require.cache[require.resolve('./paths')];
@@ -87,6 +88,7 @@ function getClientEnvironment(publicUrl) {
 
         __DEV__: process.env.NODE_ENV !== 'production',
         __PROD__:  process.env.NODE_ENV === 'production',
+        __VERSION__: appPackageJson.version,
       }
     );
   // Stringify all values so we can feed into Webpack DefinePlugin
