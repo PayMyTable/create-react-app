@@ -151,7 +151,9 @@ function containsImportUsage(autoImport, fileContent) {
     }.bind(this),
   });
   } catch (e) {
-    throw new AutoImportError(`Invalid file content ${e}`)
+    // we pass. We don't want that this module to handle the error stack trace
+    // throw new AutoImportError(`Invalid file content ${e}`)
+    return false
   }
 
   return this.res
