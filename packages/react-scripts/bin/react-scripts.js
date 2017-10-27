@@ -49,6 +49,14 @@ switch (script) {
     process.exit(result.status);
     break;
   }
+  case "generate-i18n":
+    const result = spawn.sync(
+      'node',
+      nodeArgs
+        .concat(require.resolve('@paymytable/pmt-web-i18n/run.js')),
+      { stdio: 'inherit' }
+    );
+    break;
   default:
     console.log('Unknown script "' + script + '".');
     console.log('Perhaps you need to update react-scripts?');

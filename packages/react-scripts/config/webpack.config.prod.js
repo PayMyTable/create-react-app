@@ -1,12 +1,12 @@
-  // @remove-on-eject-begin
+// @remove-on-eject-begin
 /**
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the BSD-style license found in the
- * LICENSE file in the root directory of this source tree. An additional grant
- * of patent rights can be found in the PATENTS file in the same directory.
- */
+* Copyright (c) 2015-present, Facebook, Inc.
+* All rights reserved.
+*
+* This source code is licensed under the BSD-style license found in the
+* LICENSE file in the root directory of this source tree. An additional grant
+* of patent rights can be found in the PATENTS file in the same directory.
+*/
 // @remove-on-eject-end
 'use strict';
 
@@ -22,6 +22,8 @@ const eslintFormatter = require('@paymytable/pmt-react-dev-utils/eslintFormatter
 const ModuleScopePlugin = require('@paymytable/pmt-react-dev-utils/ModuleScopePlugin');
 const paths = require('./paths');
 const getClientEnvironment = require('./env');
+
+const autoImportConfig = require('./import/config')
 
 //const LodashModuleReplacementPlugin = require('lodash-webpack-plugin');
 
@@ -54,9 +56,9 @@ const cssFilename = 'static/css/[name].[contenthash:8].css';
 // However, our output is structured with css, js and media folders.
 // To have this structure working with relative paths, we have to use custom options.
 const extractTextPluginOptions = shouldUseRelativeAssetPaths
-  ? // Making sure that the publicPath goes back to to build folder.
-    { publicPath: Array(cssFilename.split('/').length).join('../') }
-  : {};
+? // Making sure that the publicPath goes back to to build folder.
+{ publicPath: Array(cssFilename.split('/').length).join('../') }
+: {};
 
 // This is the production configuration.
 // It compiles slowly and is focused on producing a fast and minimal bundle.
@@ -81,9 +83,9 @@ module.exports = {
     publicPath: publicPath,
     // Point sourcemap entries to original disk location (format as URL on Windows)
     devtoolModuleFilenameTemplate: info =>
-      path
-        .relative(paths.appSrc, info.absoluteResourcePath)
-        .replace(/\\/g, '/'),
+    path
+    .relative(paths.appSrc, info.absoluteResourcePath)
+    .replace(/\\/g, '/'),
   },
   resolve: {
     // This allows you to set a fallback for where Webpack should look for modules.
@@ -141,6 +143,8 @@ module.exports = {
         test: /\.(js|jsx)$/,
         enforce: 'pre',
         use: [
+          // NOTE: Loaders can be chained by passing multiple loaders, which will be applied from right to left (last to first configured).
+          // so eslint must be before our code mofications (autoImport)
           {
             options: {
               formatter: eslintFormatter,
@@ -157,6 +161,14 @@ module.exports = {
             },
             loader: require.resolve('eslint-loader'),
           },
+          // must be the first module to be run, to avoid linter / compilation error of missing imports.
+          {
+            options: {
+              config: autoImportConfig,
+            },
+            loader: require.resolve('./import/auto-import-preloader'),
+          },
+
         ],
         include: [
           paths.appSrc,
@@ -389,10 +401,10 @@ module.exports = {
     // see lodash-webpack-plugin on babel-preset-react-app
     // https://www.npmjs.com/package/lodash-webpack-plugin
     //new LodashModuleReplacementPlugin({
-      // TODO: to be tested
-      //caching: true,
-      //paths: true,
-      //chaining: true,
+    // TODO: to be tested
+    //caching: true,
+    //paths: true,
+    //chaining: true,
     //}),
 
   ],

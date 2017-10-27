@@ -26,6 +26,8 @@ const babelPreset = require.resolve('@paymytable/pmt-babel-preset-react-app')
 
 const FlowTypecheckPlugin = require('@paymytable/pmt-react-dev-utils/FlowTypecheckPlugin');
 
+const autoImportConfig = require('./import/config')
+
 const CircularDependencyPlugin = require('circular-dependency-plugin')
 //const LodashModuleReplacementPlugin = require('lodash-webpack-plugin');
 
@@ -147,16 +149,20 @@ module.exports = {
   module: {
     strictExportPresence: true,
     rules: [
+
       // TODO: Disable require.ensure as it's not a standard language feature.
       // We are waiting for https://github.com/facebookincubator/create-react-app/issues/2176.
       // { parser: { requireEnsure: false } },
 
-      // First, run the linter.
+      // First, run code custom transformations and the linter.
       // It's important to do this before Babel processes the JS.
       {
         test: /\.(js|jsx)$/,
+        // see https://github.com/MoOx/eslint-loader
         enforce: 'pre',
         use: [
+          // NOTE: Loaders can be chained by passing multiple loaders, which will be applied from right to left (last to first configured).
+          // so eslint must be before our code mofications (autoImport)
           {
             options: {
               formatter: eslintFormatter,
@@ -170,6 +176,13 @@ module.exports = {
               // @remove-on-eject-end
             },
             loader: require.resolve('eslint-loader'),
+          },
+          // must be the first module to be run, to avoid linter / compilation error of missing imports.
+          {
+            options: {
+              config: autoImportConfig,
+            },
+            loader: require.resolve('./import/auto-import-preloader'),
           },
         ],
         include: [
