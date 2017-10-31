@@ -10,6 +10,8 @@
 
 'use strict';
 
+const paths = require('../config/paths')
+
 const spawn = require('@paymytable/pmt-react-dev-utils/crossSpawn');
 const args = process.argv.slice(2);
 
@@ -18,12 +20,26 @@ const scriptIndex = args.findIndex(x =>
 const script = scriptIndex === -1 ? args[0] : args[scriptIndex];
 const nodeArgs = scriptIndex > 0 ? args.slice(0, scriptIndex) : [];
 
+const handleResult = (result) => {
+  if (result.signal) {
+    if (result.signal === 'SIGKILL') {
+      console.log('SIGKILLED');
+    } else if (result.signal === 'SIGTERM') {
+      console.log('SIGTERM');
+    }
+    process.exit(1);
+  }
+  process.exit(result.status);
+}
+
+let result
+
 switch (script) {
   case 'build':
   case 'eject':
   case 'start':
   case 'test': {
-    const result = spawn.sync(
+    spawn.sync(
       'node',
       nodeArgs
         .concat(require.resolve('../scripts/' + script))
@@ -49,13 +65,26 @@ switch (script) {
     process.exit(result.status);
     break;
   }
+
+  case "analyze":
+    result = spawn.sync(
+      'node',
+      nodeArgs
+        .concat(require.resolve('source-map-explorer'))
+        .concat(paths.appBuild + '/static/js/main.*'),
+      { stdio: 'inherit' }
+    );
+    handleResult(result);
+    break;
+
   case "generate-i18n":
-    const result = spawn.sync(
+    result = spawn.sync(
       'node',
       nodeArgs
         .concat(require.resolve('@paymytable/pmt-web-i18n/run.js')),
       { stdio: 'inherit' }
     );
+    handleResult(result);
     break;
   default:
     console.log('Unknown script "' + script + '".');

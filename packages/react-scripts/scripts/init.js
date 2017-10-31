@@ -44,6 +44,7 @@ module.exports = function(
     test: 'react-scripts test --env=jsdom',
     eject: 'react-scripts eject',
     'generate-i18n': 'react-scripts generate-i18n',
+    analyze: 'react-scripts analyze',
   };
 
   fs.writeFileSync(

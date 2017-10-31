@@ -53,6 +53,7 @@
     "promise": "8.0.1",
     "react-hot-loader": "3.0.0-beta.7",
     "sass-loader": "6.0.6",
+    "source-map-explorer": "1.5.0",
     "style-loader": "0.18.2",
     "sw-precache-webpack-plugin": "0.11.4",
     "url-loader": "0.5.9",
