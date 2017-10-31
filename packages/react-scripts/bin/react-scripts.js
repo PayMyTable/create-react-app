@@ -39,7 +39,7 @@ switch (script) {
   case 'eject':
   case 'start':
   case 'test': {
-    spawn.sync(
+    result = spawn.sync(
       'node',
       nodeArgs
         .concat(require.resolve('../scripts/' + script))
