@@ -13,6 +13,8 @@
 const fs = require('fs');
 const path = require('path');
 const paths = require('./paths');
+const git = require('../utils/git')
+
 const appPackageJson = require(paths.appPackageJson)
 
 // Make sure that including paths.js after env.js will read .env variables.
@@ -89,7 +91,14 @@ function getClientEnvironment(publicUrl) {
         __DEV__: process.env.NODE_ENV !== 'production',
         __PROD__:  process.env.NODE_ENV === 'production',
         __VERSION__: appPackageJson.version,
+
+        __APP_GIT_COMMIT__: git.lastAppCommit(),
+        __SDK_GIT_COMMIT__: git.lastSdkCommit(),
+
+        __APP_GIT_BRANCH__: git.currentProjectBranch(),
+        __SDK_GIT_BRANCH__: git.currentSdkBranch(),
       }
+
     );
   // Stringify all values so we can feed into Webpack DefinePlugin
   const stringified = {
