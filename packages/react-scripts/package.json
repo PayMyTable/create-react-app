@@ -1,6 +1,6 @@
 {
   "name": "@paymytable/pmt-react-scripts",
-  "version": "1.1.10",
+  "version": "1.1.11",
   "description": "Configuration and scripts for Create React App.",
   "repository": "paymytable/pmt-create-react-app",
   "license": "BSD-3-Clause",
