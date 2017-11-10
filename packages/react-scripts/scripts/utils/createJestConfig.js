@@ -23,12 +23,19 @@ module.exports = (resolve, rootDir, isEjecting) => {
   // TODO: I don't know if it's safe or not to just use / as path separator
   // in Jest configs. We need help from somebody with Windows to determine this.
   const config = {
-    collectCoverageFrom: ['src/**/*.{js,jsx}'],
+    collectCoverageFrom: [
+      'src/**/*.{js,jsx}',
+      'pmt-react-sdk/packages/utils/**/*.{js,jsx}',
+      'pmt-react-sdk/packages/ui/**/*.{js,jsx}',
+      'pmt-react-sdk/packages/modules/**/*.{js,jsx}',
+    ],
     setupFiles: [resolve('config/polyfills.js')],
     setupTestFrameworkScriptFile: setupTestsFile,
     testMatch: [
       '<rootDir>/src/**/__tests__/**/*.js?(x)',
       '<rootDir>/src/**/?(*.)(spec|test).js?(x)',
+      '<rootDir>/pmt-react-sdk/packages/**/__tests__/**/*.js?(x)',
+      '<rootDir>/pmt-react-sdk/packages/**/?(*.)(spec|test).js?(x)',
     ],
     testEnvironment: 'node',
     testURL: 'http://localhost',
@@ -39,7 +46,9 @@ module.exports = (resolve, rootDir, isEjecting) => {
       '^.+\\.css$': resolve('config/jest/cssTransform.js'),
       '^(?!.*\\.(js|jsx|css|json)$)': resolve('config/jest/fileTransform.js'),
     },
-    transformIgnorePatterns: ['[/\\\\]node_modules[/\\\\].+\\.(js|jsx)$'],
+    transformIgnorePatterns: [
+      '[/\\\\]node_modules[/\\\\].+\\.(js|jsx)$'
+    ],
     moduleNameMapper: {
       '^react-native$': 'react-native-web',
     },
