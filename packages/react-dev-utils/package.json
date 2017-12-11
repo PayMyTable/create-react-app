@@ -1,6 +1,6 @@
 {
   "name": "@paymytable/pmt-react-dev-utils",
-  "version": "3.2.1",
+  "version": "3.2.2",
   "description": "Webpack utilities used by Create React App",
   "repository": "paymytable/pmt-create-react-app",
   "license": "MIT",
@@ -33,7 +33,7 @@
     "webpackHotDevClient.js"
   ],
   "dependencies": {
-    "@paymytable/pmt-react-error-overlay": "^3.0.0",
+    "@paymytable/pmt-react-error-overlay": "^3.0.1",
     "address": "1.0.3",
     "babel-code-frame": "6.26.0",
     "chalk": "1.1.3",
