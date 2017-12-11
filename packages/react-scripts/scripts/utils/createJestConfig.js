@@ -22,17 +22,25 @@ module.exports = (resolve, rootDir, isEjecting) => {
   // in Jest configs. We need help from somebody with Windows to determine this.
   const config = {
     collectCoverageFrom: [
-      'src/**/*.{js,jsx,.mjs}',
-      'pmt-react-sdk/packages/utils/**/*.{js,jsx,mjs}',
-      'pmt-react-sdk/packages/ui/**/*.{js,jsx,mjs}',
-      'pmt-react-sdk/packages/modules/**/*.{js,jsx,mjs}',
+      'src/**/*.{js,jsx,mjs}',
+      'pmt-react-sdk/packages/utils/src/**/*.{js,jsx,mjs}',
+      'pmt-react-sdk/packages/ui/src/**/*.{js,jsx,mjs}',
+      'pmt-react-sdk/packages/modules/src/**/*.{js,jsx,mjs}',
     ],
     setupFiles: [resolve('config/polyfills.js')],
     setupTestFrameworkScriptFile: setupTestsFile,
     testMatch: [
       '<rootDir>/src/**/__tests__/**/*.{js,jsx,mjs}',
       '<rootDir>/src/**/?(*.)(spec|test).{js,jsx,mjs}',
-      '<rootDir>/pmt-react-sdk/packages/**/__tests__/**/*.{js,jsx,mjs}',
+
+      '<rootDir>/pmt-react-sdk/packages/utils/src/**/__tests__/**/*.{js,jsx,mjs}',
+      '<rootDir>/pmt-react-sdk/packages/utils/src/**/?(*.)(spec|test).{js,jsx,mjs}',
+
+      '<rootDir>/pmt-react-sdk/packages/modules/src/**/__tests__/**/*.{js,jsx,mjs}',
+      '<rootDir>/pmt-react-sdk/packages/modules/src/**/?(*.)(spec|test).{js,jsx,mjs}',
+
+      '<rootDir>/pmt-react-sdk/packages/ui/src/**/__tests__/**/*.{js,jsx,mjs}',
+      '<rootDir>/pmt-react-sdk/packages/ui/src/**/?(*.)(spec|test).{js,jsx,mjs}',
     ],
     testEnvironment: 'node',
     testURL: 'http://localhost',

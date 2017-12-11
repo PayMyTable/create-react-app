@@ -8,7 +8,7 @@
 // @remove-on-eject-end
 'use strict';
 
-const errorOverlayMiddleware = require('@paymytable/pmt-react-error-overlay/middleware');
+const errorOverlayMiddleware = require('@paymytable/pmt-react-dev-utils/errorOverlayMiddleware');
 const noopServiceWorkerMiddleware = require('@paymytable/pmt-react-dev-utils/noopServiceWorkerMiddleware');
 const path = require('path');
 const config = require('./webpack.config.dev');
