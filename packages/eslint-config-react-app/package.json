@@ -3,7 +3,7 @@
   "version": "2.0.1",
   "description": "ESLint configuration used by Create React App",
   "repository": "paymytable/pmt-create-react-app",
-  "license": "BSD-3-Clause",
+  "license": "MIT",
   "files": [
     "index.js"
   ],

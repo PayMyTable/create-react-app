@@ -6,7 +6,7 @@
   ],
   "description": "Create React apps with no build configuration.",
   "repository": "paymytable/pmt-create-react-app",
-  "license": "BSD-3-Clause",
+  "license": "MIT",
   "engines": {
     "node": ">=4"
   },
