@@ -1,6 +1,6 @@
 {
   "name": "@paymytable/pmt-babel-preset-react-app",
-  "version": "3.1.1",
+  "version": "3.1.2",
   "description": "Babel preset used by Create React App",
   "repository": "paymytable/pmt-create-react-app",
   "license": "MIT",
@@ -23,7 +23,7 @@
     "babel-plugin-transform-runtime": "6.23.0",
     "babel-preset-env": "1.6.1",
     "babel-preset-flow": "6.23.0",
-    "babel-preset-react": "6.24.1"
+    "babel-preset-react": "6.24.1",
     "babel-preset-stage-1": "6.24.1",
     "lodash-webpack-plugin": "0.11.4",
     "react-hot-loader": "3.0.0-beta.7"
