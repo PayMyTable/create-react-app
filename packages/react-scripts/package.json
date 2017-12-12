@@ -1,6 +1,6 @@
 {
   "name": "@paymytable/pmt-react-scripts",
-  "version": "1.2.2",
+  "version": "1.2.3",
   "description": "Configuration and scripts for Create React App.",
   "repository": "paymytable/pmt-create-react-app",
   "license": "MIT",
@@ -20,8 +20,8 @@
   "dependencies": {
     "@paymytable/pmt-babel-preset-react-app": "^3.1.2",
     "@paymytable/pmt-eslint-config-react-app": "^2.0.2",
-    "@paymytable/pmt-react-dev-utils": "^3.2.2",
-    "@paymytable/pmt-react-error-overlay": "^3.0.1",
+    "@paymytable/pmt-react-dev-utils": "^3.2.3",
+    "@paymytable/pmt-react-error-overlay": "^3.0.2",
     "@paymytable/pmt-web-i18n": "0.0.3",
     "autoprefixer": "7.1.6",
     "babel-core": "6.26.0",
