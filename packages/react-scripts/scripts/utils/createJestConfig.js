@@ -58,6 +58,9 @@ module.exports = (resolve, rootDir, isEjecting) => {
     ],
     moduleNameMapper: {
       '^react-native$': 'react-native-web',
+      '^pmt-utils/(.*)$': '<rootDir>/pmt-react-sdk/packages/utils/src/$1',
+      '^pmt-modules/(.*)$': '<rootDir>/pmt-react-sdk/packages/modules/src/$1',
+      '^pmt-ui/(.*)$': '<rootDir>/pmt-react-sdk/packages/ui/src/$1',
     },
     moduleFileExtensions: [
       'web.js',
