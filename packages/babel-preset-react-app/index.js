@@ -1,10 +1,8 @@
 /**
  * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
  *
- * This source code is licensed under the BSD-style license found in the
- * LICENSE file in the root directory of this source tree. An additional grant
- * of patent rights can be found in the PATENTS file in the same directory.
+ * This source code is licensed under the MIT license found in the
+ * LICENSE file in the root directory of this source tree.
  */
 'use strict';
 
@@ -118,6 +116,8 @@ if (env === 'test') {
       ],
       // JSX, Flow
       require.resolve('babel-preset-react'),
+      //
+      require.resolve("babel-preset-stage-1"),
     ],
     plugins: plugins.concat([
       // Compiles import() to a deferred require()
@@ -150,6 +150,8 @@ if (env === 'test') {
       // preset "flow"
       // require.resolve("babel-preset-flow"),
       require.resolve("babel-preset-stage-1"),
+
+      // Important: if you add any preset here, add it to the test configuration above too
     ],
     plugins: plugins.concat([
       // function* () { yield 42; yield 43; }
@@ -162,6 +164,8 @@ if (env === 'test') {
       ],
       // Adds syntax support for import()
       require.resolve('babel-plugin-syntax-dynamic-import'),
+
+      // Important: if you add any plugin here, add it to the test configuration above too
     ]),
   };
 

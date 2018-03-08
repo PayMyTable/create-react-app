@@ -1,9 +1,9 @@
 {
   "name": "@paymytable/pmt-eslint-config-react-app",
-  "version": "2.0.1",
+  "version": "2.0.2",
   "description": "ESLint configuration used by Create React App",
   "repository": "paymytable/pmt-create-react-app",
-  "license": "BSD-3-Clause",
+  "license": "MIT",
   "files": [
     "index.js"
   ],
