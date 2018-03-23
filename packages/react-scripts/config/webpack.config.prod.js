@@ -102,6 +102,10 @@ module.exports = {
     // for React Native Web.
     extensions: ['.web.js', '.mjs', '.js', '.json', '.web.jsx', '.jsx'],
     alias: {
+      // alias the react package in order to avoid loading multiple instance of react
+      // https://github.com/JedWatson/react-select/issues/2025#issuecomment-349920421
+      'react': path.resolve(__dirname, '../../../../node_modules', 'react'),
+
       // @remove-on-eject-begin
       // Resolve Babel runtime relative to react-scripts.
       // It usually still works on npm 3 without this but it would be
