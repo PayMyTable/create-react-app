@@ -418,21 +418,6 @@ module.exports = {
     //paths: true,
     //chaining: true,
     //}),
-    function() {
-      this.plugin("done", function (statsData) {
-        var stats = statsData.toJson();
-        if (!stats.errors.length) {
-          var assets = {
-            js: stats.assetsByChunkName.main[0],
-            css: stats.assetsByChunkName.main[1]
-          }
-          FileSystem.writeFileSync(
-            path.join(__dirname, '../../../../build', 'assets.js'),
-            JSON.stringify(assets)
-          );
-        }
-      });
-    }
   ],
   // Some libraries import Node modules but don't use them in the browser.
   // Tell Webpack to provide empty mocks for them so importing them works.
