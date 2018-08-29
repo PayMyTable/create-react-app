@@ -65,6 +65,9 @@ module.exports = {
 // @remove-on-eject-begin
 const resolveOwn = relativePath => path.resolve(__dirname, '..', relativePath);
 
+const ownPackageJson = require('../package.json');
+const reactScriptsPath = resolveApp(`node_modules/${ownPackageJson.name}`);
+
 // config before eject: we're in ./node_modules/react-scripts/config/
 module.exports = {
   dotenv: resolveApp('.env'),
@@ -95,10 +98,9 @@ module.exports = {
     fs.realpathSync(resolveApp('.') + '/src/sdk/pmt-utils/src'),
     fs.realpathSync(resolveApp('.') + '/src/sdk/pmt-modules/src'),
   ],
+  reactScriptsPath: reactScriptsPath
 };
 
-const ownPackageJson = require('../package.json');
-const reactScriptsPath = resolveApp(`node_modules/${ownPackageJson.name}`);
 const reactScriptsLinked =
   fs.existsSync(reactScriptsPath) ||
   fs.lstatSync(reactScriptsPath).isSymbolicLink();

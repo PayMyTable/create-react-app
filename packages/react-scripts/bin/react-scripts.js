@@ -13,8 +13,20 @@ const paths = require('../config/paths')
 const spawn = require('@paymytable/pmt-react-dev-utils/crossSpawn');
 const args = process.argv.slice(2);
 
+const commands = [
+  'build',
+  'eject',
+  'start',
+  'test',
+  'analyze', 
+  'generate-i18n', 
+  'export-i18n',
+  'import-i18n',
+  'list-lokalise-projects',
+]
+
 const scriptIndex = args.findIndex(
-  x => x === 'build' || x === 'eject' || x === 'start' || x === 'test'
+  x => commands.indexOf(x) !== -1
 );
 const script = scriptIndex === -1 ? args[0] : args[scriptIndex];
 const nodeArgs = scriptIndex > 0 ? args.slice(0, scriptIndex) : [];
@@ -85,6 +97,37 @@ switch (script) {
     );
     handleResult(result);
     break;
+
+  case "export-i18n":
+    result = spawn.sync(
+      'node',
+      nodeArgs
+        .concat(require.resolve('@paymytable/pmt-web-i18n/export.js')),
+      { stdio: 'inherit' }
+    );
+    handleResult(result);
+    break;
+
+    case "import-i18n":
+    result = spawn.sync(
+      'node',
+      nodeArgs
+        .concat(require.resolve('@paymytable/pmt-web-i18n/import.js')),
+      { stdio: 'inherit' }
+    );
+    handleResult(result);
+    break;
+
+  case "list-lokalise-projects":
+  result = spawn.sync(
+    'node',
+    nodeArgs
+      .concat(require.resolve('@paymytable/pmt-web-i18n/list_projects.js')),
+    { stdio: 'inherit' }
+  );
+  handleResult(result);
+  break;
+    
   default:
     console.log('Unknown script "' + script + '".');
     console.log('Perhaps you need to update react-scripts?');
