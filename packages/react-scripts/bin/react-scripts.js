@@ -92,7 +92,7 @@ switch (script) {
     result = spawn.sync(
       'node',
       nodeArgs
-        .concat(require.resolve('@paymytable/pmt-web-i18n/run.js')),
+        .concat(require.resolve('@paymytable/pmt-web-i18n/generate-i18n.js')),
       { stdio: 'inherit' }
     );
     handleResult(result);
