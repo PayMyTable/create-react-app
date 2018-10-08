@@ -1,5 +1,6 @@
 {
   "name": "@paymytable/pmt-react-dev-utils",
+  "note": "DO NOT PUBLISH, we use the create-react-app one",
   "version": "6.0.4",
   "description": "Webpack utilities used by Create React App",
   "repository": "facebook/create-react-app",
@@ -57,7 +58,7 @@
     "loader-utils": "1.1.0",
     "opn": "5.4.0",
     "pkg-up": "2.0.0",
-    "@paymytable/pmt-react-error-overlay": "^5.0.4",
+    "react-error-overlay": "^5.0.4",
     "recursive-readdir": "2.2.2",
     "shell-quote": "1.6.1",
     "sockjs-client": "1.1.5",

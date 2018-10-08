@@ -20,6 +20,56 @@ const validateBoolOption = (name, value, defaultValue) => {
   return value;
 };
 
+// @PMT dev plugins
+const pmtDevPlugins = [
+  // Adds hot loader
+  // https://github.com/gaearon/react-hot-loader/tree/master/docs#migration-to-30
+  require.resolve('react-hot-loader/babel'),
+]
+
+// @PMT other plugins
+const pmtPlugins = [
+  //
+  // add decoractors
+  // Ex: @withMyContainer
+  // 
+  [
+    require.resolve("@babel/plugin-proposal-decorators"),
+    { 
+      "legacy": true 
+    }
+  ],
+  // add trailing function commas
+  // Ex: this.myFunc(
+  //  a,
+  //  b,
+  //  c, <--
+  // )
+  require.resolve("babel-plugin-syntax-trailing-function-commas"),
+  // transform the eventual for-of
+  // for of is not supported on old browsers
+  // require.resolve("babel-plugin-transform-es2015-for-of"),
+
+  // allow to `export v from 'mod';`
+  // https://babeljs.io/docs/en/next/babel-plugin-proposal-export-default-from.html
+  // https://www.npmjs.com/package/@babel/plugin-proposal-export-default-from
+  require.resolve("@babel/plugin-proposal-export-default-from"),
+
+  // https://github.com/lodash/babel-plugin-lodash
+  [
+    require.resolve("babel-plugin-lodash"),
+    {
+      // This plugin is moving in a lib agnostic direction, to become a generic cherry-pick plugin
+      // so babel-plugin-lodash is not limited to lodash. It can be used with recompose as well.
+      // see https://github.com/acdlite/recompose
+      id: [
+        "lodash",
+        "recompose"
+      ]
+    }
+  ]
+];
+
 module.exports = function(api, opts, env) {
   if (!opts) {
     opts = {};
@@ -159,6 +209,9 @@ module.exports = function(api, opts, env) {
       isEnvTest &&
         // Transform dynamic import to require
         require('babel-plugin-transform-dynamic-import').default,
-    ].filter(Boolean),
+    ]
+    .concat(pmtPlugins)
+    .concat(isEnvDevelopment ? pmtDevPlugins : [])
+    .filter(Boolean),
   };
 };

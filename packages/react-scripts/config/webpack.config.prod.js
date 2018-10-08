@@ -18,19 +18,16 @@ const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const OptimizeCSSAssetsPlugin = require('optimize-css-assets-webpack-plugin');
 const safePostCssParser = require('postcss-safe-parser');
 const ManifestPlugin = require('webpack-manifest-plugin');
-const InterpolateHtmlPlugin = require('@paymytable/pmt-react-dev-utils/InterpolateHtmlPlugin');
-const SWPrecacheWebpackPlugin = require('sw-precache-webpack-plugin');
-const eslintFormatter = require('@paymytable/pmt-react-dev-utils/eslintFormatter');
-const ModuleScopePlugin = require('@paymytable/pmt-react-dev-utils/ModuleScopePlugin');
+const InterpolateHtmlPlugin = require('react-dev-utils/InterpolateHtmlPlugin');
+const ModuleScopePlugin = require('react-dev-utils/ModuleScopePlugin');
 const WorkboxWebpackPlugin = require('workbox-webpack-plugin');
-const getCSSModuleLocalIdent = require('@paymytable/pmt-react-dev-utils/getCSSModuleLocalIdent');
+const getCSSModuleLocalIdent = require('react-dev-utils/getCSSModuleLocalIdent');
 const paths = require('./paths');
 const getClientEnvironment = require('./env');
 const getCacheIdentifier = require('react-dev-utils/getCacheIdentifier');
 const ModuleNotFoundPlugin = require('react-dev-utils/ModuleNotFoundPlugin');
 
-const autoImportConfig = require('./import/config')
-const FileSystem = require("fs");
+const autoImportConfig = require('./import/config') // @PMT
 
 //const LodashModuleReplacementPlugin = require('lodash-webpack-plugin');
 
@@ -288,7 +285,7 @@ module.exports = {
               // TODO: consider separate config for production,
               // e.g. to enable no-console and no-debugger only in production.
               baseConfig: {
-                extends: [require.resolve('@paymytable/pmt-eslint-config-react-app')],
+                extends: [require.resolve('eslint-config-react-app')],
                 settings: { react: { version: '999.999.999' } },
               },
               ignore: false,
@@ -298,6 +295,7 @@ module.exports = {
             loader: require.resolve('eslint-loader'),
           },
           // must be the first module to be run, to avoid linter / compilation error of missing imports.
+          // @PMT
           {
             options: {
               config: autoImportConfig,
@@ -308,7 +306,7 @@ module.exports = {
         ],
         include: [
           paths.appSrc,
-        ].concat(paths.sdkIncludePaths), // concat the PayMyTable sdk to build it.
+        ].concat(paths.sdkIncludePaths), // @PMT concat the PayMyTable sdk to build it.
       },
       {
         // "oneOf" will traverse all following loaders until one will
@@ -335,7 +333,7 @@ module.exports = {
             loader: require.resolve('babel-loader'),
             options: {
               customize: require.resolve(
-                'babel-preset-react-app/webpack-overrides'
+                '@paymytable/pmt-babel-preset-react-app/webpack-overrides'
               ),
               // @remove-on-eject-begin
               babelrc: false,
@@ -347,15 +345,15 @@ module.exports = {
               // is sane and uses Babel options. Instead of options, we use
               // the react-scripts and babel-preset-react-app versions.
               cacheIdentifier: getCacheIdentifier('production', [
-                '@paymytable/pmt-babel-plugin-named-asset-import',
+                'babel-plugin-named-asset-import',
                 '@paymytable/pmt-babel-preset-react-app',
-                '@paymytable/pmt-react-dev-utils',
+                'react-dev-utils',
                 '@paymytable/pmt-react-scripts',
               ]),
               // @remove-on-eject-end
               plugins: [
                 [
-                  require.resolve('@paymytable/pmt-babel-plugin-named-asset-import'),
+                  require.resolve('babel-plugin-named-asset-import'),
                   {
                     loaderMap: {
                       svg: {
@@ -404,9 +402,9 @@ module.exports = {
               cacheCompression: true,
               // @remove-on-eject-begin
               cacheIdentifier: getCacheIdentifier('production', [
-                '@paymytable/pmt-babel-plugin-named-asset-import',
+                'babel-plugin-named-asset-import',
                 '@paymytable/pmt-babel-preset-react-app',
-                '@paymytable/pmt-react-dev-utils',
+                'react-dev-utils',
                 '@paymytable/pmt-react-scripts',
               ]),
               // @remove-on-eject-end

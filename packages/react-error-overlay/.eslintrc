@@ -1,5 +1,5 @@
 {
-  "extends": "@paymytable/pmt-selint-config-react-app",
+  "extends": "eslint-config-react-app",
   "rules": {
     "curly": "warn"
   }

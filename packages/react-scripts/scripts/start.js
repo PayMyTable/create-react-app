@@ -33,15 +33,15 @@ const fs = require('fs');
 const chalk = require('chalk');
 const webpack = require('webpack');
 const WebpackDevServer = require('webpack-dev-server');
-const clearConsole = require('@paymytable/pmt-react-dev-utils/clearConsole');
-const checkRequiredFiles = require('@paymytable/pmt-react-dev-utils/checkRequiredFiles');
+const clearConsole = require('react-dev-utils/clearConsole');
+const checkRequiredFiles = require('react-dev-utils/checkRequiredFiles');
 const {
   choosePort,
   createCompiler,
   prepareProxy,
   prepareUrls,
-} = require('@paymytable/pmt-react-dev-utils/WebpackDevServerUtils');
-const openBrowser = require('@paymytable/pmt-react-dev-utils/openBrowser');
+} = require('react-dev-utils/WebpackDevServerUtils');
+const openBrowser = require('react-dev-utils/openBrowser');
 const paths = require('../config/paths');
 const config = require('../config/webpack.config.dev');
 const createDevServerConfig = require('../config/webpackDevServer.config');
@@ -112,7 +112,6 @@ checkBrowsers(paths.appPath, isInteractive)
         clearConsole();
       }
       console.log(chalk.cyan('Starting the PayMyTable development server...\n'));
-      // TODO: add option
       //openBrowser(urls.localUrlForBrowser);
     });
 

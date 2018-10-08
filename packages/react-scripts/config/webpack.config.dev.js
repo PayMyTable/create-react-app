@@ -13,10 +13,11 @@ const webpack = require('webpack');
 const PnpWebpackPlugin = require('pnp-webpack-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const CaseSensitivePathsPlugin = require('case-sensitive-paths-webpack-plugin');
-const InterpolateHtmlPlugin = require('@paymytable/pmt-react-dev-utils/InterpolateHtmlPlugin');
-const WatchMissingNodeModulesPlugin = require('@paymytable/pmt-react-dev-utils/WatchMissingNodeModulesPlugin');
-const eslintFormatter = require('@paymytable/pmt-react-dev-utils/eslintFormatter');
-const ModuleScopePlugin = require('@paymytable/pmt-react-dev-utils/ModuleScopePlugin');
+const InterpolateHtmlPlugin = require('react-dev-utils/InterpolateHtmlPlugin');
+const WatchMissingNodeModulesPlugin = require('react-dev-utils/WatchMissingNodeModulesPlugin');
+const eslintFormatter = require('react-dev-utils/eslintFormatter');
+const ModuleScopePlugin = require('react-dev-utils/ModuleScopePlugin');
+const getCSSModuleLocalIdent = require('react-dev-utils/getCSSModuleLocalIdent');
 const getClientEnvironment = require('./env');
 const paths = require('./paths');
 const ManifestPlugin = require('webpack-manifest-plugin');
@@ -24,8 +25,6 @@ const getCacheIdentifier = require('react-dev-utils/getCacheIdentifier');
 const ModuleNotFoundPlugin = require('react-dev-utils/ModuleNotFoundPlugin');
 
 const babelPreset = require.resolve('@paymytable/pmt-babel-preset-react-app')
-
-const FlowTypecheckPlugin = require('@paymytable/pmt-react-dev-utils/FlowTypecheckPlugin');
 
 const autoImportConfig = require('./import/config')
 
@@ -94,10 +93,6 @@ module.exports = {
   // These are the "entry points" to our application.
   // This means they will be the "root" imports that are included in JS bundle.
   entry: [
-    // add react-hot-loader v3
-    // https://github.com/gaearon/react-hot-loader/tree/master/docs#migration-to-30
-    // @PMT
-    require.resolve('react-hot-loader/patch'),
     // Include an alternative client for WebpackDevServer. A client's job is to
     // connect to WebpackDevServer by a socket and get notified about changes.
     // When you save a file, the client will either apply hot updates (in case
@@ -108,16 +103,14 @@ module.exports = {
     // the line below with these two lines if you prefer the stock client:
     // require.resolve('webpack-dev-server/client') + '?/',
     // require.resolve('webpack/hot/dev-server'),
-    require.resolve('@paymytable/pmt-react-dev-utils/webpackHotDevClient'),
-    // We ship a few polyfills by default:
-    require.resolve('./polyfills'),
+    require.resolve('react-dev-utils/webpackHotDevClient'),
     // Errors should be considered fatal in development
     // If an error occured here:
     // - do you have correctly install / link ?
     // - in case of link, on pmt-react-error-overlay:
     //  - npm install
     //  - npm build
-    require.resolve('@paymytable/pmt-react-error-overlay'),
+    require.resolve('react-error-overlay'),
     // Finally, this is your app's code:
     paths.appIndexJs,
     // We include the app code last so that if there is a runtime error during
@@ -220,7 +213,7 @@ module.exports = {
               eslintPath: require.resolve('eslint'),
               // @remove-on-eject-begin
               baseConfig: {
-                extends: [require.resolve('@paymytable/pmt-eslint-config-react-app')],
+                extends: [require.resolve('eslint-config-react-app')],
                 settings: { react: { version: '999.999.999' } },
               },
               ignore: false,
@@ -267,7 +260,7 @@ module.exports = {
             loader: require.resolve('babel-loader'),
             options: {
               customize: require.resolve(
-                'babel-preset-react-app/webpack-overrides'
+                '@paymytable/pmt-babel-preset-react-app/webpack-overrides'
               ),
               // @remove-on-eject-begin
               babelrc: false,
@@ -279,15 +272,17 @@ module.exports = {
               // is sane and uses Babel options. Instead of options, we use
               // the react-scripts and babel-preset-react-app versions.
               cacheIdentifier: getCacheIdentifier('development', [
-                '@paymytable/pmt-babel-plugin-named-asset-import',
+                'babel-plugin-named-asset-import',
                 '@paymytable/pmt-babel-preset-react-app',
-                '@paymytable/pmt-react-dev-utils',
+                'react-dev-utils',
                 '@paymytable/pmt-react-scripts',
               ]),
+              cacheDirectory: true, // @PMT
               // @remove-on-eject-end
               plugins: [
+                require.resolve('react-hot-loader/babel'), // @PMT
                 [
-                  require.resolve('@paymytable/pmt-babel-plugin-named-asset-import'),
+                  require.resolve('babel-plugin-named-asset-import'),
                   {
                     loaderMap: {
                       svg: {
@@ -326,9 +321,9 @@ module.exports = {
               cacheCompression: false,
               // @remove-on-eject-begin
               cacheIdentifier: getCacheIdentifier('development', [
-                '@paymytable/pmt-babel-plugin-named-asset-import',
+                'babel-plugin-named-asset-import',
                 '@paymytable/pmt-babel-preset-react-app',
-                '@paymytable/pmt-react-dev-utils',
+                'react-dev-utils',
                 '@paymytable/pmt-react-scripts',
               ]),
               // @remove-on-eject-end
@@ -339,17 +334,17 @@ module.exports = {
               sourceMaps: false,
             },
           },
-          {
-            test: /\.scss$/,
-            include: [
-              paths.appSrc
-            ].concat(paths.sdkIncludePaths), // concat the PayMyTable sdk to build it.,
-            loaders: [
-              require.resolve('style-loader'),
-              require.resolve('css-loader'),
-              require.resolve('sass-loader'),
-            ]
-          },
+          // {
+          //   test: /\.scss$/,
+          //   include: [
+          //     paths.appSrc
+          //   ].concat(paths.sdkIncludePaths), // concat the PayMyTable sdk to build it.,
+          //   loaders: [
+          //     require.resolve('style-loader'),
+          //     require.resolve('css-loader'),
+          //     require.resolve('sass-loader'),
+          //   ]
+          // },
           // "postcss" loader applies autoprefixer to our CSS.
           // "css" loader resolves paths in CSS and adds assets as dependencies.
           // "style" loader turns CSS into JS modules that inject <style> tags.
@@ -466,19 +461,6 @@ module.exports = {
     // https://github.com/jmblog/how-to-optimize-momentjs-with-webpack
     // You can remove this if you don't use Moment.js:
     new webpack.IgnorePlugin(/^\.\/locale$/, /moment$/),
-
-    // Run Flow on files with the @flow header
-    // TODO: test
-    // new FlowTypecheckPlugin(),
-
-    // see lodash-webpack-plugin on babel-preset-react-app
-    // https://www.npmjs.com/package/lodash-webpack-plugin
-    //new LodashModuleReplacementPlugin({
-      // TODO: to be tested
-      //caching: true,
-      //paths: true,
-      //chaining: true,
-    //}),
 
     new CircularDependencyPlugin({
       exclude: /node_modules/,

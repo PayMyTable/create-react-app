@@ -36,11 +36,11 @@ const webpack = require('webpack');
 const bfj = require('bfj');
 const config = require('../config/webpack.config.prod');
 const paths = require('../config/paths');
-const checkRequiredFiles = require('@paymytable/pmt-react-dev-utils/checkRequiredFiles');
-const formatWebpackMessages = require('@paymytable/pmt-react-dev-utils/formatWebpackMessages');
-const printHostingInstructions = require('@paymytable/pmt-react-dev-utils/printHostingInstructions');
-const FileSizeReporter = require('@paymytable/pmt-react-dev-utils/FileSizeReporter');
-const printBuildError = require('@paymytable/pmt-react-dev-utils/printBuildError');
+const checkRequiredFiles = require('react-dev-utils/checkRequiredFiles');
+const formatWebpackMessages = require('react-dev-utils/formatWebpackMessages');
+const printHostingInstructions = require('react-dev-utils/printHostingInstructions');
+const FileSizeReporter = require('react-dev-utils/FileSizeReporter');
+const printBuildError = require('react-dev-utils/printBuildError');
 
 const measureFileSizesBeforeBuild =
   FileSizeReporter.measureFileSizesBeforeBuild;

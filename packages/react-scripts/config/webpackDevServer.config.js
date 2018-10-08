@@ -8,9 +8,9 @@
 // @remove-on-eject-end
 'use strict';
 
-const errorOverlayMiddleware = require('@paymytable/pmt-react-dev-utils/errorOverlayMiddleware');
-const evalSourceMapMiddleware = require('@paymytable/pmt-react-dev-utils/evalSourceMapMiddleware');
-const noopServiceWorkerMiddleware = require('@paymytable/pmt-react-dev-utils/noopServiceWorkerMiddleware');
+const errorOverlayMiddleware = require('react-dev-utils/errorOverlayMiddleware');
+const evalSourceMapMiddleware = require('react-dev-utils/evalSourceMapMiddleware');
+const noopServiceWorkerMiddleware = require('react-dev-utils/noopServiceWorkerMiddleware');
 const ignoredFiles = require('react-dev-utils/ignoredFiles');
 const config = require('./webpack.config.dev');
 const paths = require('./paths');

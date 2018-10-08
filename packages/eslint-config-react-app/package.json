@@ -1,5 +1,7 @@
 {
   "name": "@paymytable/pmt-eslint-config-react-app",
+  "note": "DO NOT PUBLISH We use the create-react-app one",
+  "private": true,
   "version": "3.0.3",
   "description": "ESLint configuration used by Create React App",
   "repository": "facebook/create-react-app",
