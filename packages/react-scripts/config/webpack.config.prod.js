@@ -27,6 +27,7 @@ const getClientEnvironment = require('./env');
 const getCacheIdentifier = require('react-dev-utils/getCacheIdentifier');
 const ModuleNotFoundPlugin = require('react-dev-utils/ModuleNotFoundPlugin');
 
+const webpackAliases = require("./webpack.aliases") // @PMT
 const autoImportConfig = require('./import/config') // @PMT
 
 //const LodashModuleReplacementPlugin = require('lodash-webpack-plugin');
@@ -210,7 +211,10 @@ module.exports = {
     // We placed these paths second because we want `node_modules` to "win"
     // if there are any conflicts. This matches Node resolution mechanism.
     // https://github.com/facebook/create-react-app/issues/253
-    modules: ['node_modules'].concat(
+    modules: [
+      paths.sdkNodeModules, // @PMT
+      'node_modules',
+    ].concat(
       // It is guaranteed to exist because we tweak it in `env.js`
       process.env.NODE_PATH.split(path.delimiter).filter(Boolean)
     ),
@@ -224,7 +228,9 @@ module.exports = {
     alias: {
       // alias the react package in order to avoid loading multiple instance of react
       // https://github.com/JedWatson/react-select/issues/2025#issuecomment-349920421
-      'react': path.resolve(__dirname, '../../../../node_modules', 'react'),
+      //'react': path.resolve(__dirname, '../../../../node_modules', 'react'),
+      // use react version on pmt-modules
+      'react': path.resolve(paths.sdkNodeModules, 'react'), // @PMT
 
       // @remove-on-eject-begin
       // Resolve Babel runtime relative to react-scripts.
@@ -239,10 +245,7 @@ module.exports = {
       // https://www.smashingmagazine.com/2016/08/a-glimpse-into-the-future-with-react-native-for-web/
       'react-native': 'react-native-web',
 
-      'pmt-ui': paths.pmtUi, // @PMT
-      'pmt-utils': paths.pmtUtils, // @PMT
-      'pmt-modules': paths.pmtModules, // @PMT
-      'app':  paths.appSrc, // @PMT
+      ...webpackAliases, // @PMT
     },
     plugins: [
       // Adds support for installing with Plug'n'Play, leading to faster installs and adding
@@ -253,7 +256,8 @@ module.exports = {
       // To fix this, we prevent you from importing files out of src/ -- if you'd like to,
       // please link the files into your node_modules/ and let module-resolution kick in.
       // Make sure your source files are compiled, as they will not be processed in any way.
-      new ModuleScopePlugin(paths.appSrc, [paths.appPackageJson]),
+      // @PMT
+      new ModuleScopePlugin([ paths.appSrc ].concat(paths.sdkIncludePaths), [paths.appPackageJson]),
     ],
   },
   resolveLoader: {

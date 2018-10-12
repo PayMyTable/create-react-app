@@ -15,7 +15,6 @@ const HtmlWebpackPlugin = require('html-webpack-plugin');
 const CaseSensitivePathsPlugin = require('case-sensitive-paths-webpack-plugin');
 const InterpolateHtmlPlugin = require('react-dev-utils/InterpolateHtmlPlugin');
 const WatchMissingNodeModulesPlugin = require('react-dev-utils/WatchMissingNodeModulesPlugin');
-const eslintFormatter = require('react-dev-utils/eslintFormatter');
 const ModuleScopePlugin = require('react-dev-utils/ModuleScopePlugin');
 const getCSSModuleLocalIdent = require('react-dev-utils/getCSSModuleLocalIdent');
 const getClientEnvironment = require('./env');
@@ -24,9 +23,8 @@ const ManifestPlugin = require('webpack-manifest-plugin');
 const getCacheIdentifier = require('react-dev-utils/getCacheIdentifier');
 const ModuleNotFoundPlugin = require('react-dev-utils/ModuleNotFoundPlugin');
 
-const babelPreset = require.resolve('@paymytable/pmt-babel-preset-react-app')
-
-const autoImportConfig = require('./import/config')
+const webpackAliases = require("./webpack.aliases") // @PMT
+const autoImportConfig = require('./import/config') // @PMT
 
 const CircularDependencyPlugin = require('circular-dependency-plugin')
 //const LodashModuleReplacementPlugin = require('lodash-webpack-plugin');
@@ -149,10 +147,9 @@ module.exports = {
     // We placed these paths second because we want `node_modules` to "win"
     // if there are any conflicts. This matches Node resolution mechanism.
     // https://github.com/facebook/create-react-app/issues/253
-    modules: [ 
-      paths.appSrc, // @PMT
-      paths.appNodeModules, // @PMT
-      'node_modules'
+    modules: [
+      paths.sdkNodeModules, // @PMT
+      'node_modules',
     ].concat(
       // It is guaranteed to exist because we tweak it in `env.js`
       process.env.NODE_PATH.split(path.delimiter).filter(Boolean)
@@ -169,10 +166,7 @@ module.exports = {
       // https://www.smashingmagazine.com/2016/08/a-glimpse-into-the-future-with-react-native-for-web/
       'react-native': 'react-native-web',
 
-      'pmt-ui': paths.pmtUi, // @PMT
-      'pmt-utils': paths.pmtUtils, // @PMT
-      'pmt-modules': paths.pmtModules, // @PMT
-      'app':  paths.appSrc, // @PMT
+      ...webpackAliases, // @PMT
     },
     plugins: [
       // Adds support for installing with Plug'n'Play, leading to faster installs and adding
@@ -183,7 +177,8 @@ module.exports = {
       // To fix this, we prevent you from importing files out of src/ -- if you'd like to,
       // please link the files into your node_modules/ and let module-resolution kick in.
       // Make sure your source files are compiled, as they will not be processed in any way.
-      new ModuleScopePlugin(paths.appSrc, [paths.appPackageJson]),
+      // @PMT
+      new ModuleScopePlugin([ paths.appSrc ].concat(paths.sdkIncludePaths), [paths.appPackageJson]),
     ],
   },
   resolveLoader: {
