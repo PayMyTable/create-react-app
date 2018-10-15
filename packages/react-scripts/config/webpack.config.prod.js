@@ -212,7 +212,7 @@ module.exports = {
     // if there are any conflicts. This matches Node resolution mechanism.
     // https://github.com/facebook/create-react-app/issues/253
     modules: [
-      paths.sdkNodeModules, // @PMT
+      paths.sdkNodeModules, // @PMT, search package on the sdk node_modules first
       'node_modules',
     ].concat(
       // It is guaranteed to exist because we tweak it in `env.js`
