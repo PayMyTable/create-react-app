@@ -47,8 +47,18 @@ const tmp = require('tmp');
 const unpack = require('tar-pack').unpack;
 const url = require('url');
 const hyperquest = require('hyperquest');
+const envinfo = require('envinfo');
+const os = require('os');
 
 const packageJson = require('./package.json');
+
+// These files should be allowed to remain on a failed install,
+// but then silently removed during the next create.
+const errorLogFilePatterns = [
+  'npm-debug.log',
+  'yarn-error.log',
+  'yarn-debug.log',
+];
 
 let projectName;
 
@@ -60,10 +70,13 @@ const program = new commander.Command(packageJson.name)
     projectName = name;
   })
   .option('--verbose', 'print additional logs')
+  .option('--info', 'print environment debug info')
   .option(
     '--scripts-version <alternative-package>',
     'use a non-standard version of react-scripts'
   )
+  .option('--use-npm')
+  .option('--use-pnp')
   .allowUnknownOption()
   .on('--help', () => {
     console.log(`    Only ${chalk.green('<project-directory>')} is required.`);
@@ -72,14 +85,25 @@ const program = new commander.Command(packageJson.name)
       `    A custom ${chalk.cyan('--scripts-version')} can be one of:`
     );
     console.log(`      - a specific npm version: ${chalk.green('0.8.2')}`);
+    console.log(`      - a specific npm tag: ${chalk.green('@next')}`);
     console.log(
       `      - a custom fork published on npm: ${chalk.green(
         'my-react-scripts'
       )}`
     );
     console.log(
+      `      - a local path relative to the current working directory: ${chalk.green(
+        'file:../my-react-scripts'
+      )}`
+    );
+    console.log(
       `      - a .tgz archive: ${chalk.green(
         'https://mysite.com/my-react-scripts-0.8.2.tgz'
+      )}`
+    );
+    console.log(
+      `      - a .tar.gz archive: ${chalk.green(
+        'https://mysite.com/my-react-scripts-0.8.2.tar.gz'
       )}`
     );
     console.log(
@@ -91,12 +115,33 @@ const program = new commander.Command(packageJson.name)
     );
     console.log(
       `      ${chalk.cyan(
-        'https://github.com/facebookincubator/create-react-app/issues/new'
+        'https://github.com/facebook/create-react-app/issues/new'
       )}`
     );
     console.log();
   })
   .parse(process.argv);
+
+if (program.info) {
+  console.log(chalk.bold('\nEnvironment Info:'));
+  return envinfo
+    .run(
+      {
+        System: ['OS', 'CPU'],
+        Binaries: ['Node', 'npm', 'Yarn'],
+        Browsers: ['Chrome', 'Edge', 'Internet Explorer', 'Firefox', 'Safari'],
+        npmPackages: ['react', 'react-dom', 'react-scripts'],
+        npmGlobalPackages: ['create-react-app'],
+      },
+      {
+        clipboard: true,
+        duplicates: true,
+        showNotFound: true,
+      }
+    )
+    .then(console.log)
+    .then(() => console.log(chalk.green('Copied To Clipboard!\n')));
+}
 
 if (typeof projectName === 'undefined') {
   console.error('Please specify the project directory:');
@@ -133,10 +178,12 @@ createApp(
   projectName,
   program.verbose,
   program.scriptsVersion,
+  program.useNpm,
+  program.usePnp,
   hiddenProgram.internalTestingTemplate
 );
 
-function createApp(name, verbose, version, template) {
+function createApp(name, verbose, version, useNpm, usePnp, template) {
   const root = path.resolve(name);
   const appName = path.basename(root);
 
@@ -156,10 +203,10 @@ function createApp(name, verbose, version, template) {
   };
   fs.writeFileSync(
     path.join(root, 'package.json'),
-    JSON.stringify(packageJson, null, 2)
+    JSON.stringify(packageJson, null, 2) + os.EOL
   );
 
-  const useYarn = shouldUseYarn();
+  const useYarn = useNpm ? false : shouldUseYarn();
   const originalDirectory = process.cwd();
   process.chdir(root);
   if (!useYarn && !checkThatNpmCanReadCwd()) {
@@ -169,7 +216,9 @@ function createApp(name, verbose, version, template) {
   if (!semver.satisfies(process.version, '>=6.0.0')) {
     console.log(
       chalk.yellow(
-        `You are using Node ${process.version} so the project will be bootstrapped with an old unsupported version of tools.\n\n` +
+        `You are using Node ${
+          process.version
+        } so the project will be bootstrapped with an old unsupported version of tools.\n\n` +
           `Please update to Node 6 or higher for a better, fully supported experience.\n`
       )
     );
@@ -183,7 +232,9 @@ function createApp(name, verbose, version, template) {
       if (npmInfo.npmVersion) {
         console.log(
           chalk.yellow(
-            `You are using npm ${npmInfo.npmVersion} so the project will be boostrapped with an old unsupported version of tools.\n\n` +
+            `You are using npm ${
+              npmInfo.npmVersion
+            } so the project will be boostrapped with an old unsupported version of tools.\n\n` +
               `Please update to npm 3 or higher for a better, fully supported experience.\n`
           )
         );
@@ -191,8 +242,39 @@ function createApp(name, verbose, version, template) {
       // Fall back to latest supported react-scripts for npm 3
       version = 'react-scripts@0.9.x';
     }
+  } else if (usePnp) {
+    const yarnInfo = checkYarnVersion();
+    if (!yarnInfo.hasMinYarnPnp) {
+      if (yarnInfo.yarnVersion) {
+        chalk.yellow(
+          `You are using Yarn ${
+            yarnInfo.yarnVersion
+          } together with the --use-pnp flag, but Plug'n'Play is only supported starting from the 1.12 release.\n\n` +
+            `Please update to Yarn 1.12 or higher for a better, fully supported experience.\n`
+        );
+      }
+      // 1.11 had an issue with webpack-dev-middleware, so better not use PnP with it (never reached stable, but still)
+      usePnp = false;
+    }
   }
-  run(root, appName, version, verbose, originalDirectory, template, useYarn);
+
+  if (useYarn) {
+    fs.copySync(
+      require.resolve('./yarn.lock.cached'),
+      path.join(root, 'yarn.lock')
+    );
+  }
+
+  run(
+    root,
+    appName,
+    version,
+    verbose,
+    originalDirectory,
+    template,
+    useYarn,
+    usePnp
+  );
 }
 
 function shouldUseYarn() {
@@ -204,7 +286,7 @@ function shouldUseYarn() {
   }
 }
 
-function install(root, useYarn, dependencies, verbose, isOnline) {
+function install(root, useYarn, usePnp, dependencies, verbose, isOnline) {
   return new Promise((resolve, reject) => {
     let command;
     let args;
@@ -214,10 +296,13 @@ function install(root, useYarn, dependencies, verbose, isOnline) {
       if (!isOnline) {
         args.push('--offline');
       }
+      if (usePnp) {
+        args.push('--enable-pnp');
+      }
       [].push.apply(args, dependencies);
 
       // Explicitly set cwd() to work around issues like
-      // https://github.com/facebookincubator/create-react-app/issues/3326.
+      // https://github.com/facebook/create-react-app/issues/3326.
       // Unfortunately we can only do this for Yarn because npm support for
       // equivalent --prefix flag doesn't help with this issue.
       // This is why for npm, we run checkThatNpmCanReadCwd() early instead.
@@ -238,6 +323,12 @@ function install(root, useYarn, dependencies, verbose, isOnline) {
         '--loglevel',
         'error',
       ].concat(dependencies);
+
+      if (usePnp) {
+        console.log(chalk.yellow("NPM doesn't support PnP."));
+        console.log(chalk.yellow('Falling back to the regular installs.'));
+        console.log();
+      }
     }
 
     if (verbose) {
@@ -264,9 +355,10 @@ function run(
   verbose,
   originalDirectory,
   template,
-  useYarn
+  useYarn,
+  usePnp
 ) {
-  const packageToInstall = getInstallPackage(version);
+  const packageToInstall = getInstallPackage(version, originalDirectory);
   const allDependencies = ['react', 'react-dom', packageToInstall];
 
   console.log('Installing packages. This might take a couple of minutes.');
@@ -287,28 +379,39 @@ function run(
       );
       console.log();
 
-      return install(root, useYarn, allDependencies, verbose, isOnline).then(
-        () => packageName
-      );
+      return install(
+        root,
+        useYarn,
+        usePnp,
+        allDependencies,
+        verbose,
+        isOnline
+      ).then(() => packageName);
     })
-    .then(packageName => {
+    .then(async packageName => {
       checkNodeVersion(packageName);
       setCaretRangeForRuntimeDeps(packageName);
 
-      const scriptsPath = path.resolve(
-        process.cwd(),
-        'node_modules',
-        packageName,
-        'scripts',
-        'init.js'
+      const pnpPath = path.resolve(process.cwd(), '.pnp.js');
+
+      const nodeArgs = fs.existsSync(pnpPath) ? ['--require', pnpPath] : [];
+
+      await executeNodeScript(
+        {
+          cwd: process.cwd(),
+          args: nodeArgs,
+        },
+        [root, appName, verbose, originalDirectory, template],
+        `
+        var init = require('${packageName}/scripts/init.js');
+        init.apply(null, JSON.parse(process.argv[1]));
+      `
       );
-      const init = require(scriptsPath);
-      init(root, appName, verbose, originalDirectory, template);
 
       if (version === 'react-scripts@0.9.x') {
         console.log(
           chalk.yellow(
-            `\nNote: the project was boostrapped with an old unsupported version of tools.\n` +
+            `\nNote: the project was bootstrapped with an old unsupported version of tools.\n` +
               `Please update to Node >=6 and npm >=3 to get supported tools in new projects.\n`
           )
         );
@@ -326,22 +429,12 @@ function run(
       console.log();
 
       // On 'exit' we will delete these files from target directory.
-      const knownGeneratedFiles = [
-        'package.json',
-        'npm-debug.log',
-        'yarn-error.log',
-        'yarn-debug.log',
-        'node_modules',
-      ];
+      const knownGeneratedFiles = ['package.json', 'yarn.lock', 'node_modules'];
       const currentFiles = fs.readdirSync(path.join(root));
       currentFiles.forEach(file => {
         knownGeneratedFiles.forEach(fileToMatch => {
-          // This will catch `(npm-debug|yarn-error|yarn-debug).log*` files
-          // and the rest of knownGeneratedFiles.
-          if (
-            (fileToMatch.match(/.log/g) && file.indexOf(fileToMatch) === 0) ||
-            file === fileToMatch
-          ) {
+          // This remove all of knownGeneratedFiles.
+          if (file === fileToMatch) {
             console.log(`Deleting generated file... ${chalk.cyan(file)}`);
             fs.removeSync(path.join(root, file));
           }
@@ -351,7 +444,7 @@ function run(
       if (!remainingFiles.length) {
         // Delete target folder if empty
         console.log(
-          `Deleting ${chalk.cyan(`${appName} /`)} from ${chalk.cyan(
+          `Deleting ${chalk.cyan(`${appName}/`)} from ${chalk.cyan(
             path.resolve(root, '..')
           )}`
         );
@@ -363,14 +456,23 @@ function run(
     });
 }
 
-function getInstallPackage(version) {
+function getInstallPackage(version, originalDirectory) {
   let packageToInstall = 'react-scripts';
   const validSemver = semver.valid(version);
   if (validSemver) {
     packageToInstall += `@${validSemver}`;
   } else if (version) {
-    // for tar.gz or alternative paths
-    packageToInstall = version;
+    if (version[0] === '@' && version.indexOf('/') === -1) {
+      packageToInstall += version;
+    } else if (version.match(/^file:/)) {
+      packageToInstall = `file:${path.resolve(
+        originalDirectory,
+        version.match(/^file:(.*)?$/)[1]
+      )}`;
+    } else {
+      // for tar.gz or alternative paths
+      packageToInstall = version;
+    }
   }
   return packageToInstall;
 }
@@ -415,7 +517,7 @@ function extractStream(stream, dest) {
 
 // Extract package name from tarball url or path.
 function getPackageName(installPackage) {
-  if (installPackage.indexOf('.tgz') > -1) {
+  if (installPackage.match(/^.+\.(tgz|tar\.gz)$/)) {
     return getTemporaryDirectory()
       .then(obj => {
         let stream;
@@ -438,7 +540,7 @@ function getPackageName(installPackage) {
           `Could not extract the package name from the archive: ${err.message}`
         );
         const assumedProjectName = installPackage.match(
-          /^.+\/(.+?)(?:-\d+.+)?\.tgz$/
+          /^.+\/(.+?)(?:-\d+.+)?\.(tgz|tar\.gz)$/
         )[1];
         console.log(
           `Based on the filename, assuming it is "${chalk.cyan(
@@ -457,6 +559,13 @@ function getPackageName(installPackage) {
     return Promise.resolve(
       installPackage.charAt(0) + installPackage.substr(1).split('@')[0]
     );
+  } else if (installPackage.match(/^file:/)) {
+    const installPackagePath = installPackage.match(/^file:(.*)?$/)[1];
+    const installPackageJson = require(path.join(
+      installPackagePath,
+      'package.json'
+    ));
+    return Promise.resolve(installPackageJson.name);
   }
   return Promise.resolve(installPackage);
 }
@@ -478,6 +587,23 @@ function checkNpmVersion() {
   };
 }
 
+function checkYarnVersion() {
+  let hasMinYarnPnp = false;
+  let yarnVersion = null;
+  try {
+    yarnVersion = execSync('yarnpkg --version')
+      .toString()
+      .trim();
+    hasMinYarnPnp = semver.gte(yarnVersion, '1.12.0');
+  } catch (err) {
+    // ignore
+  }
+  return {
+    hasMinYarnPnp: hasMinYarnPnp,
+    yarnVersion: yarnVersion,
+  };
+}
+
 function checkNodeVersion(packageName) {
   const packageJsonPath = path.resolve(
     process.cwd(),
@@ -485,6 +611,11 @@ function checkNodeVersion(packageName) {
     packageName,
     'package.json'
   );
+
+  if (!fs.existsSync(packageJsonPath)) {
+    return;
+  }
+
   const packageJson = require(packageJsonPath);
   if (!packageJson.engines || !packageJson.engines.node) {
     return;
@@ -574,12 +705,14 @@ function setCaretRangeForRuntimeDeps(packageName) {
   makeCaretRange(packageJson.dependencies, 'react');
   makeCaretRange(packageJson.dependencies, 'react-dom');
 
-  fs.writeFileSync(packagePath, JSON.stringify(packageJson, null, 2));
+  fs.writeFileSync(packagePath, JSON.stringify(packageJson, null, 2) + os.EOL);
 }
 
 // If project only contains files generated by GH, it’s safe.
+// Also, if project contains remnant error logs from a previous
+// installation, lets remove them now.
 // We also special case IJ-based products .idea because it integrates with CRA:
-// https://github.com/facebookincubator/create-react-app/pull/368#issuecomment-243446094
+// https://github.com/facebook/create-react-app/pull/368#issuecomment-243446094
 function isSafeToCreateProjectIn(root, name) {
   const validFiles = [
     '.DS_Store',
@@ -593,31 +726,67 @@ function isSafeToCreateProjectIn(root, name) {
     '.hg',
     '.hgignore',
     '.hgcheck',
+    '.npmignore',
+    'mkdocs.yml',
+    'docs',
+    '.travis.yml',
+    '.gitlab-ci.yml',
+    '.gitattributes',
   ];
   console.log();
 
   const conflicts = fs
     .readdirSync(root)
-    .filter(file => !validFiles.includes(file));
-  if (conflicts.length < 1) {
-    return true;
+    .filter(file => !validFiles.includes(file))
+    // Don't treat log files from previous installation as conflicts
+    .filter(
+      file => !errorLogFilePatterns.some(pattern => file.indexOf(pattern) === 0)
+    );
+
+  if (conflicts.length > 0) {
+    console.log(
+      `The directory ${chalk.green(name)} contains files that could conflict:`
+    );
+    console.log();
+    for (const file of conflicts) {
+      console.log(`  ${file}`);
+    }
+    console.log();
+    console.log(
+      'Either try using a new directory name, or remove the files listed above.'
+    );
+
+    return false;
   }
 
-  console.log(
-    `The directory ${chalk.green(name)} contains files that could conflict:`
-  );
-  console.log();
-  for (const file of conflicts) {
-    console.log(`  ${file}`);
-  }
-  console.log();
-  console.log(
-    'Either try using a new directory name, or remove the files listed above.'
-  );
-
-  return false;
+  // Remove any remnant files from a previous installation
+  const currentFiles = fs.readdirSync(path.join(root));
+  currentFiles.forEach(file => {
+    errorLogFilePatterns.forEach(errorLogFilePattern => {
+      // This will catch `(npm-debug|yarn-error|yarn-debug).log*` files
+      if (file.indexOf(errorLogFilePattern) === 0) {
+        fs.removeSync(path.join(root, file));
+      }
+    });
+  });
+  return true;
 }
 
+function getProxy() {
+  if (process.env.https_proxy) {
+    return process.env.https_proxy;
+  } else {
+    try {
+      // Trying to read https-proxy from .npmrc
+      let httpsProxy = execSync('npm config get https-proxy')
+        .toString()
+        .trim();
+      return httpsProxy !== 'null' ? httpsProxy : undefined;
+    } catch (e) {
+      return;
+    }
+  }
+}
 function checkThatNpmCanReadCwd() {
   const cwd = process.cwd();
   let childOutput = null;
@@ -688,15 +857,36 @@ function checkIfOnline(useYarn) {
 
   return new Promise(resolve => {
     dns.lookup('registry.yarnpkg.com', err => {
-      if (err != null && process.env.https_proxy) {
+      let proxy;
+      if (err != null && (proxy = getProxy())) {
         // If a proxy is defined, we likely can't resolve external hostnames.
         // Try to resolve the proxy name as an indication of a connection.
-        dns.lookup(url.parse(process.env.https_proxy).hostname, proxyErr => {
+        dns.lookup(url.parse(proxy).hostname, proxyErr => {
           resolve(proxyErr == null);
         });
       } else {
         resolve(err == null);
       }
+    });
+  });
+}
+
+function executeNodeScript({ cwd, args }, data, source) {
+  return new Promise((resolve, reject) => {
+    const child = spawn(
+      process.execPath,
+      [...args, '-e', source, '--', JSON.stringify(data)],
+      { cwd, stdio: 'inherit' }
+    );
+
+    child.on('close', code => {
+      if (code !== 0) {
+        reject({
+          command: `node ${args.join(' ')}`,
+        });
+        return;
+      }
+      resolve();
     });
   });
 }

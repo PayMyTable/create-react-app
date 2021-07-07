@@ -13,20 +13,20 @@ const fs = require('fs');
 const url = require('url');
 
 // Make sure any symlinks in the project folder are resolved:
-// https://github.com/facebookincubator/create-react-app/issues/637
+// https://github.com/facebook/create-react-app/issues/637
 const appDirectory = fs.realpathSync(process.cwd());
 const resolveApp = relativePath => path.resolve(appDirectory, relativePath);
 
 const envPublicUrl = process.env.PUBLIC_URL;
 
-function ensureSlash(path, needsSlash) {
-  const hasSlash = path.endsWith('/');
+function ensureSlash(inputPath, needsSlash) {
+  const hasSlash = inputPath.endsWith('/');
   if (hasSlash && !needsSlash) {
-    return path.substr(path, path.length - 1);
+    return inputPath.substr(0, inputPath.length - 1);
   } else if (!hasSlash && needsSlash) {
-    return `${path}/`;
+    return `${inputPath}/`;
   } else {
-    return path;
+    return inputPath;
   }
 }
 
@@ -49,6 +49,7 @@ function getServedPath(appPackageJson) {
 // config after eject: we're in ./config/
 module.exports = {
   dotenv: resolveApp('.env'),
+  appPath: resolveApp('.'),
   appBuild: resolveApp('build'),
   appPublic: resolveApp('public'),
   appHtml: resolveApp('public/index.html'),
@@ -57,6 +58,7 @@ module.exports = {
   appSrc: resolveApp('src'),
   yarnLockFile: resolveApp('yarn.lock'),
   testsSetup: resolveApp('src/setupTests.js'),
+  proxySetup: resolveApp('src/setupProxy.js'),
   appNodeModules: resolveApp('node_modules'),
   publicUrl: getPublicUrl(resolveApp('package.json')),
   servedPath: getServedPath(resolveApp('package.json')),
@@ -80,6 +82,7 @@ module.exports = {
   appSrc: resolveApp('src'),
   yarnLockFile: resolveApp('yarn.lock'),
   testsSetup: resolveApp('src/setupTests.js'),
+  proxySetup: resolveApp('src/setupProxy.js'),
   appNodeModules: resolveApp('node_modules'),
   publicUrl: getPublicUrl(resolveApp('package.json')),
   servedPath: getServedPath(resolveApp('package.json')),
@@ -87,18 +90,20 @@ module.exports = {
   ownPath: resolveOwn('.'),
   ownNodeModules: resolveOwn('node_modules'), // This is empty on npm 3
 
-    // compile our sdk instead of using a compiled version.
-  pmtUi: resolveApp("src/sdk/pmt-ui/src"),
-  pmtUtils: resolveApp("src/sdk/pmt-utils/src"),
-  pmtModules: resolveApp("src/sdk/pmt-modules/src"),
+  // compile our sdk instead of using a compiled version.
+  pmtUi: resolveApp("pmt-react-sdk/packages/ui/src"),
+  pmtUtils: resolveApp("pmt-react-sdk/packages/utils/src"),
+  pmtModules: resolveApp("pmt-react-sdk/packages/modules/src"),
 
   // https://github.com/webpack/webpack/issues/1643
   sdkIncludePaths: [
-    fs.realpathSync(resolveApp('.') + '/src/sdk/pmt-ui/src'),
-    fs.realpathSync(resolveApp('.') + '/src/sdk/pmt-utils/src'),
-    fs.realpathSync(resolveApp('.') + '/src/sdk/pmt-modules/src'),
+    fs.realpathSync(resolveApp('.') + '/pmt-react-sdk/packages/ui/src'),
+    fs.realpathSync(resolveApp('.') + '/pmt-react-sdk/packages/utils/src'),
+    fs.realpathSync(resolveApp('.') + '/pmt-react-sdk/packages/modules/src'),
   ],
-  reactScriptsPath: reactScriptsPath
+  reactScriptsPath: reactScriptsPath,
+
+  sdkNodeModules: fs.realpathSync(resolveApp('.') + '/pmt-react-sdk/node_modules'),
 };
 
 const reactScriptsLinked =
@@ -126,6 +131,7 @@ if (
     appSrc: resolveOwn('template/src'),
     yarnLockFile: resolveOwn('template/yarn.lock'),
     testsSetup: resolveOwn('template/src/setupTests.js'),
+    proxySetup: resolveOwn('template/src/setupProxy.js'),
     appNodeModules: resolveOwn('node_modules'),
     publicUrl: getPublicUrl(resolveOwn('package.json')),
     servedPath: getServedPath(resolveOwn('package.json')),
